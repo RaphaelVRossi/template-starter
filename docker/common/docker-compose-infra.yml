@@ -1,0 +1,53 @@
+version: '3'
+services:
+  eurekaservice:
+    image: template-eureka-service:v1
+    ports:
+    - "8761:8761"
+    environment:
+      SERVER_PORT:            "8761"
+
+  zipkinservice:
+    image: template-zipkin-service:v1
+    ports:
+    - "9411:9411"
+    environment:
+      SERVER_PORT:            "9411"
+      PROFILE:                "default"
+      ZIPKINSERVER_URI:       "http://zipkinservice:9411"
+
+  configservice:
+    image: template-config-service:v1
+    depends_on:
+    - eurekaservice
+    ports:
+    - "8888:8888"
+    environment:
+      SERVER_PORT:            "8888"
+      ENCRYPT_KEY:            "IMSYMMETRIC"
+      EUREKASERVER_PROTOCOL:  "http://"
+      EUREKASERVER_HOST:      "eurekaservice"
+      EUREKASERVER_PORT:      "8761"
+      EUREKASERVER_CONTEXT:   "/eureka/"
+      ZIPKINSERVER_URI:       "http://zipkinservice:9411"
+
+  zuulservice:
+    image: template-zuul-service:v1
+    depends_on:
+    - configservice
+    - zipkinservice
+    ports:
+    - "5555:5555"
+    environment:
+      SERVER_PORT:            "5555"
+      PROFILE:                "default"
+      EUREKASERVER_PROTOCOL:  "http://"
+      EUREKASERVER_HOST:      "eurekaservice"
+      EUREKASERVER_PORT:      "8761"
+      EUREKASERVER_CONTEXT:   "/eureka/"
+      CONFIGSERVER_PROTOCOL:  "http://"
+      CONFIGSERVER_HOST:      "configservice"
+      CONFIGSERVER_PORT:      "8888"
+      ZIPKINSERVER_PROTOCOL:  "http://"
+      ZIPKINSERVER_HOST:      "zipkinservice"
+      ZIPKINSERVER_PORT:      "9411"

@@ -1,0 +1,22 @@
+version: '3'
+services:
+  userservice:
+    image: template-user-service:v1
+    ports:
+    - "8090:8090"
+    environment:
+      SERVER_PORT:            "8090"
+      PROFILE:                "default"
+      EUREKASERVER_PROTOCOL:  "http://"
+      EUREKASERVER_HOST:      "eurekaservice"
+      EUREKASERVER_PORT:      "8761"
+      EUREKASERVER_CONTEXT:   "/eureka/"
+      CONFIGSERVER_PROTOCOL:  "http://"
+      CONFIGSERVER_HOST:      "configservice"
+      CONFIGSERVER_PORT:      "8888"
+      ZUULSERVER_PROTOCOL:    "http://"
+      ZUULSERVER_HOST:        "zuulservice"
+      ZUULSERVER_PORT:        "5555"
+      ZIPKINSERVER_PROTOCOL:  "http://"
+      ZIPKINSERVER_HOST:      "zipkinservice"
+      ZIPKINSERVER_PORT:      "9411"
